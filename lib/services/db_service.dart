@@ -104,7 +104,7 @@ class DatabaseService {
 
     // Remove the Post from the database.
     await db.delete(
-      'dogs',
+      'posts',
       // Use a `where` clause to delete a specific post.
       where: "id = ?",
       // Pass the Post's id as a whereArg to prevent SQL injection.

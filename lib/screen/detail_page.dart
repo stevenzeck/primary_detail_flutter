@@ -21,7 +21,7 @@ class DetailPage extends StatelessWidget {
                 CupertinoNavigationBarData(previousPageTitle: "Post List"),
       ),
       body: Container(
-        padding: const EdgeInsets.fromLTRB(10.0, 100.0, 10.0, 10.0),
+        padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
