@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import '../model/post.dart';
-import '../services/utils.dart';
+import 'dart:io' show Platform;
+
 
 class DetailPage extends StatelessWidget {
   DetailPage({Key key, @required this.item}) : super(key: key);
@@ -15,13 +16,11 @@ class DetailPage extends StatelessWidget {
       appBar: PlatformAppBar(
         title: Text("Post Detail"),
         automaticallyImplyLeading: true,
-        cupertino: isTablet(context)
-            ? null
-            : (_, __) =>
-                CupertinoNavigationBarData(previousPageTitle: "Post List"),
+        cupertino: (_, __) =>
+            CupertinoNavigationBarData(previousPageTitle: "Posts"),
       ),
       body: Container(
-        padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 10.0),
+        padding: EdgeInsets.fromLTRB(10.0, Platform.isIOS ? 100.0 : 20.0, 10.0, 10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
