@@ -3,7 +3,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:primarydetailflutter/model/post.dart';
 import 'package:primarydetailflutter/screen/detail_screen.dart';
 import 'package:primarydetailflutter/screen/list_screen.dart';
-import 'package:primarydetailflutter/services/db_service.dart';
 
 import 'RoutePath.dart';
 
@@ -33,22 +32,10 @@ class PostRouterDelegate extends RouterDelegate<PostRoutePath>
       pages: [
         platformPage(
           key: ValueKey('PostsListPage'),
-          child: FutureBuilder(
-              future: DatabaseService.db.posts(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  posts = snapshot.data;
-                  return PostsListScreen(
-                      posts: posts,
-                      selectedPost: _selectedPost,
-                      onTapped: _handlePostTapped);
-                } else if (snapshot.hasError) {
-                  var error = snapshot.error.toString();
-                  return Center(child: Text(error));
-                } else {
-                  return Center(child: Text("Sorry"));
-                }
-              }),
+          child: PostsListScreen(
+              selectedPost: _selectedPost,
+              onTapped: _handlePostTapped,
+              onPostsLoaded: onPostsLoaded),
           context: context,
         ),
         if (show404)
@@ -101,8 +88,12 @@ class PostRouterDelegate extends RouterDelegate<PostRoutePath>
 
   void _handlePostTapped(Post post) {
     _selectedPost = post;
-    post.isread = 1;
-    DatabaseService.db.updatePost(post);
+    post.isread = true;
+    PostDatabase.db.updatePost(post);
     notifyListeners();
+  }
+
+  void onPostsLoaded(List<Post> posts) {
+    this.posts = posts;
   }
 }

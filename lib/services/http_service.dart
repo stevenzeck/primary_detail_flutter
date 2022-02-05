@@ -15,7 +15,7 @@ class HttpService {
 
       List<Post> posts = body
           .map(
-            (dynamic item) => Post.fromJson(item),
+            (dynamic item) => Post.fromMap(item),
           )
           .toList();
 
