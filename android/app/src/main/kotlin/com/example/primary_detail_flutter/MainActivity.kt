@@ -1,4 +1,4 @@
-package com.example.primarydetailflutter
+package com.example.primary_detail_flutter
 
 import io.flutter.embedding.android.FlutterActivity
 

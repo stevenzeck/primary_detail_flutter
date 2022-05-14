@@ -1,28 +1,27 @@
-import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:primarydetailflutter/services/http_service.dart';
 import 'package:sqflite/sqflite.dart';
 
-final String tablePosts = 'posts';
-final String columnId = '_id';
-final String columnUserId = 'userid';
-final String columnTitle = 'title';
-final String columnBody = 'body';
-final String columnIsRead = 'isread';
+const String tablePosts = 'posts';
+const String columnId = 'id';
+const String columnUserId = 'userId';
+const String columnTitle = 'title';
+const String columnBody = 'body';
+const String columnIsRead = 'isread';
 
 class Post {
-  int id;
-  int userId;
-  String title;
-  String body;
-  bool isread;
+  late final int id;
+  late final int userId;
+  late final String title;
+  late final String body;
+  late bool isread;
 
   Post(
-      {@required this.id,
-      @required this.userId,
-      @required this.title,
-      @required this.body,
-      @required this.isread});
+      {required this.id,
+      required this.userId,
+      required this.title,
+      required this.body,
+      required this.isread});
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
@@ -31,9 +30,7 @@ class Post {
       columnBody: body,
       columnIsRead: isread == true ? 1 : 0
     };
-    if (id != null) {
-      map[columnId] = id;
-    }
+    map[columnId] = id;
     return map;
   }
 
@@ -48,19 +45,13 @@ class Post {
 
 class PostDatabase {
   final HttpService httpService = HttpService();
-  static Database _database;
+  Database? _database;
 
   PostDatabase._();
 
   static final PostDatabase db = PostDatabase._();
 
-  Future<Database> get database async {
-    if (_database != null) return _database;
-
-    // if _database is null we instantiate it
-    _database = await getDatabase();
-    return _database;
-  }
+  Future get database async => _database ?? await getDatabase();
 
   getDatabase() async {
     return openDatabase(
@@ -106,12 +97,12 @@ create table $tablePosts(
     // Query the table for all The Posts.
     List<Map<String, dynamic>> maps = await db.query(tablePosts);
 
-    if (maps.length == 0) {
+    if (maps.isEmpty) {
       List<Post> posts = await httpService.getPosts();
       Batch batch = db.batch();
-      posts.forEach((post) {
+      for (var post in posts) {
         batch.insert(tablePosts, post.toMap());
-      });
+      }
       batch.commit();
       maps = await db.query(tablePosts);
     }

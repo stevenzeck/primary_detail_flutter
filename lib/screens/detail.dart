@@ -6,7 +6,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import '../model/post.dart';
 
 class DetailPage extends StatelessWidget {
-  DetailPage({Key key, @required this.item}) : super(key: key);
+  const DetailPage({Key? key, required this.item}) : super(key: key);
 
   final Post item;
 
@@ -14,7 +14,7 @@ class DetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return PlatformScaffold(
       appBar: PlatformAppBar(
-        title: Text("Post Detail"),
+        title: const Text("Post Detail"),
         automaticallyImplyLeading: true,
         cupertino: (_, __) =>
             CupertinoNavigationBarData(previousPageTitle: "Posts"),
@@ -26,17 +26,17 @@ class DetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-                margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                 child: Text("ID: ${item.id}")),
             Container(
-                margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                 child: Text("User ID: ${item.userId}")),
             Container(
-                margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                 child: Text("Title: ${item.title}")),
             Container(
-                margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                child: Text("${item.body}")),
+                margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                child: Text(item.body)),
           ],
         ),
       ),
