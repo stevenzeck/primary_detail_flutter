@@ -11,7 +11,7 @@ class HttpService {
   Future<List<Post>> getPosts() async {
     // Handle network exceptions and response errors
     try {
-      Response res = await get(postsURL).timeout(Duration(seconds: 10));
+      Response res = await get(postsURL).timeout(const Duration(seconds: 10));
 
       if (res.statusCode == 200) {
         List<dynamic> body = jsonDecode(res.body);

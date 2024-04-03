@@ -6,7 +6,7 @@ import '../model/post.dart';
 // The detail screen does not change, so it is stateless
 class DetailPage extends StatelessWidget {
   /// Pass the post into the DetailPage constructor from the [PostNavigator]
-  const DetailPage({Key? key, required this.item}) : super(key: key);
+  const DetailPage({super.key, required this.item});
 
   final Post item;
 

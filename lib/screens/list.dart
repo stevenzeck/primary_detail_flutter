@@ -6,7 +6,7 @@ import '../routing/route_state.dart';
 import '../widgets/post_list.dart';
 
 class PostsListScreen extends StatefulWidget {
-  const PostsListScreen({Key? key}) : super(key: key);
+  const PostsListScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => PostsListState();

@@ -11,8 +11,8 @@ class PostList extends StatelessWidget {
   const PostList({
     required this.posts,
     this.onTap,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) => ListView.separated(

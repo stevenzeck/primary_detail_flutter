@@ -11,7 +11,7 @@ void main() {
 }
 
 class PostsApp extends StatefulWidget {
-  const PostsApp({Key? key}) : super(key: key);
+  const PostsApp({super.key});
 
   @override
   State<StatefulWidget> createState() => _PostsAppState();

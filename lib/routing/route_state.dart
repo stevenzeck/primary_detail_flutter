@@ -24,7 +24,7 @@ class RouteState extends ChangeNotifier {
   // Navigate to the specified route
   Future<void> go(String route) async {
     this.route =
-        await _parser.parseRouteInformation(RouteInformation(location: route));
+        await _parser.parseRouteInformation(RouteInformation(uri: Uri.parse(route)));
   }
 }
 
@@ -32,7 +32,7 @@ class RouteStateScope extends InheritedNotifier<RouteState> {
   const RouteStateScope({
     required super.notifier, // Type casting for InheritedNotifier
     required super.child,
-    Key? super.key, // Declare Key as nullable
+    super.key, // Declare Key as nullable
   });
 
   // Returns the RouteState instance from the widget tree

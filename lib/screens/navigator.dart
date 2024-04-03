@@ -10,8 +10,8 @@ class PostNavigator extends StatefulWidget {
 
   const PostNavigator({
     required this.navigatorKey,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<PostNavigator> createState() => _PostNavigatorState();

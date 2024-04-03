@@ -17,18 +17,18 @@ class PostRouteInformationParser extends RouteInformationParser<PostRoutePath> {
   @override
   Future<PostRoutePath> parseRouteInformation(
       RouteInformation routeInformation) async {
-    final path = routeInformation.location!;
-    final queryParams = Uri.parse(path).queryParameters;
+    final path = routeInformation.uri;
+    final queryParams = path.queryParameters;
     var parsedRoute = initialRoute;
 
     for (var pathTemplate in _pathTemplates) {
       final parameters = <String>[];
       var pathRegExp = pathToRegExp(pathTemplate, parameters: parameters);
-      final match = pathRegExp.matchAsPrefix(path);
+      final match = pathRegExp.matchAsPrefix(path.toString());
 
       if (match != null) {
         final params = extract(parameters, match);
-        parsedRoute = PostRoutePath(path, pathTemplate, params, queryParams);
+        parsedRoute = PostRoutePath(path.toString(), pathTemplate, params, queryParams);
         break;
       }
     }
@@ -39,5 +39,5 @@ class PostRouteInformationParser extends RouteInformationParser<PostRoutePath> {
   // Restore route information from a given PostRoutePath object
   @override
   RouteInformation restoreRouteInformation(PostRoutePath configuration) =>
-      RouteInformation(location: configuration.path);
+      RouteInformation(uri: Uri.parse(configuration.path));
 }
