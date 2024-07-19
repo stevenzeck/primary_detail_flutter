@@ -17,19 +17,23 @@ class PostList extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListView.separated(
         itemCount: posts.length,
-        itemBuilder: (context, index) => PlatformListTile(
-          title: Text(
-            posts[index].title,
-            style: TextStyle(
-              fontWeight: posts[index].isread == false
-                  ? FontWeight.bold
-                  : FontWeight.normal,
+        itemBuilder: (context, index) {
+          final post = posts[index];
+          //FIXME using main2/list2, the tile is still selected for a second upon coming back to list from detail
+          return PlatformListTile(
+            key: ValueKey(post.id),
+            title: Text(
+              post.title,
+              style: TextStyle(
+                fontWeight:
+                    post.isread == false ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
-          ),
-          onTap: onTap != null
-              ? () => onTap!(posts[index]) // Add null check for onTap
-              : null,
-        ),
+            onTap: onTap != null
+                ? () => onTap!(post) // Add null check for onTap
+                : null,
+          );
+        },
         separatorBuilder: (context, index) {
           return const Divider(height: 1, thickness: 1);
         },
