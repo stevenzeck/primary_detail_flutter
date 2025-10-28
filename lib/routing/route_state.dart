@@ -23,8 +23,9 @@ class RouteState extends ChangeNotifier {
 
   // Navigate to the specified route
   Future<void> go(String route) async {
-    this.route =
-        await _parser.parseRouteInformation(RouteInformation(uri: Uri.parse(route)));
+    this.route = await _parser.parseRouteInformation(
+      RouteInformation(uri: Uri.parse(route)),
+    );
   }
 }
 

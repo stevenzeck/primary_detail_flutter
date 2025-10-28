@@ -18,9 +18,7 @@ class HttpService {
 
         // Convert the dynamic list to a list of Post objects
         List<Post> posts = body
-            .map(
-              (dynamic item) => Post.fromMap(item),
-            )
+            .map((dynamic item) => Post.fromMap(item))
             .toList();
 
         return posts;

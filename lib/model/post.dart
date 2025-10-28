@@ -16,12 +16,13 @@ class Post {
   late final String body;
   late bool isread;
 
-  Post(
-      {required this.id,
-      required this.userId,
-      required this.title,
-      required this.body,
-      required this.isread});
+  Post({
+    required this.id,
+    required this.userId,
+    required this.title,
+    required this.body,
+    required this.isread,
+  });
 
   Map<String, dynamic> toMap() {
     return {
@@ -29,7 +30,7 @@ class Post {
       columnUserId: userId,
       columnTitle: title,
       columnBody: body,
-      columnIsRead: isread ? 1 : 0
+      columnIsRead: isread ? 1 : 0,
     };
   }
 
@@ -97,8 +98,11 @@ class PostDatabase {
 
   Future<Post> getPost(int postId) async {
     final db = await database;
-    List<Map<String, dynamic>> maps =
-        await db.query(tablePosts, where: '$columnId = ?', whereArgs: [postId]);
+    List<Map<String, dynamic>> maps = await db.query(
+      tablePosts,
+      where: '$columnId = ?',
+      whereArgs: [postId],
+    );
     return Post.fromMap(maps[0]);
   }
 
@@ -114,10 +118,6 @@ class PostDatabase {
 
   Future<void> deletePost(int id) async {
     final db = await database;
-    await db.delete(
-      tablePosts,
-      where: "$columnId = ?",
-      whereArgs: [id],
-    );
+    await db.delete(tablePosts, where: "$columnId = ?", whereArgs: [id]);
   }
 }

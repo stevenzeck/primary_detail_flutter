@@ -8,5 +8,9 @@ class PostRoutePath {
   final Map<String, String> queryParameters;
 
   PostRoutePath(
-      this.path, this.pathTemplate, this.parameters, this.queryParameters);
+    this.path,
+    this.pathTemplate,
+    this.parameters,
+    this.queryParameters,
+  );
 }

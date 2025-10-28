@@ -10,13 +10,14 @@ class PostRouteInformationParser extends RouteInformationParser<PostRoutePath> {
   PostRouteInformationParser({
     required List<String> allowedPaths,
     String initialRoute = '/',
-  })  : initialRoute = PostRoutePath(initialRoute, initialRoute, {}, {}),
-        _pathTemplates = allowedPaths;
+  }) : initialRoute = PostRoutePath(initialRoute, initialRoute, {}, {}),
+       _pathTemplates = allowedPaths;
 
   // Parse route information and return a PostRoutePath object
   @override
   Future<PostRoutePath> parseRouteInformation(
-      RouteInformation routeInformation) async {
+    RouteInformation routeInformation,
+  ) async {
     final path = routeInformation.uri;
     final queryParams = path.queryParameters;
     var parsedRoute = initialRoute;
@@ -28,7 +29,12 @@ class PostRouteInformationParser extends RouteInformationParser<PostRoutePath> {
 
       if (match != null) {
         final params = extract(parameters, match);
-        parsedRoute = PostRoutePath(path.toString(), pathTemplate, params, queryParams);
+        parsedRoute = PostRoutePath(
+          path.toString(),
+          pathTemplate,
+          params,
+          queryParams,
+        );
         break;
       }
     }

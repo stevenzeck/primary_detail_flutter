@@ -16,8 +16,9 @@ class PostRouterDelegate extends RouterDelegate<PostRoutePath>
     required this.builder,
     required this.navigatorKey,
   }) {
-    routeState
-        .addListener(notifyListeners); // Add notifyListeners as a listener
+    routeState.addListener(
+      notifyListeners,
+    ); // Add notifyListeners as a listener
   }
 
   // Build the widget to display based on the current route

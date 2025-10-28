@@ -17,9 +17,8 @@ class DetailPage extends StatelessWidget {
       appBar: PlatformAppBar(
         title: const Text("Post Detail"),
         automaticallyImplyLeading: true,
-        cupertino: (_, __) => CupertinoNavigationBarData(
-          previousPageTitle: "Posts",
-        ),
+        cupertino: (_, _) =>
+            CupertinoNavigationBarData(previousPageTitle: "Posts"),
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 10.0),
