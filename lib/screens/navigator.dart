@@ -8,10 +8,7 @@ import '../screens.dart';
 class PostNavigator extends StatefulWidget {
   final GlobalKey<NavigatorState> navigatorKey;
 
-  const PostNavigator({
-    required this.navigatorKey,
-    super.key,
-  });
+  const PostNavigator({required this.navigatorKey, super.key});
 
   @override
   State<PostNavigator> createState() => _PostNavigatorState();
@@ -19,6 +16,12 @@ class PostNavigator extends StatefulWidget {
 
 class _PostNavigatorState extends State<PostNavigator> {
   final _postDetailsKey = const ValueKey('Post details screens');
+
+  void _handlePageRemoved(Page<dynamic> page) {
+    if (page.key == _postDetailsKey) {
+      RouteStateScope.of(context).go('/posts');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +36,7 @@ class _PostNavigatorState extends State<PostNavigator> {
 
     return Navigator(
       key: widget.navigatorKey,
-      onPopPage: (route, dynamic result) {
-        if (route.settings is Page &&
-            (route.settings as Page).key == _postDetailsKey) {
-          routeState.go('/posts');
-        }
-
-        return route.didPop(result);
-      },
+      onDidRemovePage: _handlePageRemoved,
       pages: [
         platformPage(
           key: const ValueKey('PostsListPage'),
@@ -54,9 +50,7 @@ class _PostNavigatorState extends State<PostNavigator> {
               future: selectedPost,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return DetailPage(
-                    item: snapshot.data!,
-                  );
+                  return DetailPage(item: snapshot.data!);
                 } else if (snapshot.hasError) {
                   var error = snapshot.error.toString();
                   return Center(child: Text(error));
