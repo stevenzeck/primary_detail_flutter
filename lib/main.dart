@@ -5,7 +5,6 @@ import 'package:primary_detail_flutter/screens/navigator.dart';
 
 import 'routing.dart';
 
-// Runs the app
 void main() {
   runApp(const PostsApp());
 }
@@ -23,57 +22,92 @@ class _PostsAppState extends State<PostsApp> {
   late final PostRouterDelegate _routerDelegate;
   late final PostRouteInformationParser _routeParser;
 
+  ThemeMode? themeMode = ThemeMode.system;
+
   @override
   void initState() {
-    /// Configure the parser with all of the app's allowed path templates.
     _routeParser = PostRouteInformationParser(
-      allowedPaths: [
-        '/posts',
-        '/post/:postId',
-      ],
+      allowedPaths: ['/posts', '/post/:postId'],
       initialRoute: '/posts',
     );
-
     _routeState = RouteState(_routeParser);
-
     _routerDelegate = PostRouterDelegate(
       routeState: _routeState,
       navigatorKey: _navigatorKey,
-      builder: (context) => PostNavigator(
-        navigatorKey: _navigatorKey,
-      ),
+      builder: (context) => PostNavigator(navigatorKey: _navigatorKey),
     );
-
     super.initState();
   }
 
   @override
-  Widget build(BuildContext context) => RouteStateScope(
-        notifier: _routeState,
-        child: Theme(
-          data: ThemeData(
-            pageTransitionsTheme: const PageTransitionsTheme(
-              builders: <TargetPlatform, PageTransitionsBuilder>{
-                TargetPlatform.android: OpenUpwardsPageTransitionsBuilder(),
-                TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-                TargetPlatform.linux: FadeUpwardsPageTransitionsBuilder(),
-                TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
-                TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
-              },
-            ),
+  Widget build(BuildContext context) {
+    final materialLightTheme = ThemeData.light();
+    final materialDarkTheme = ThemeData.dark();
+    const darkDefaultCupertinoTheme = CupertinoThemeData(
+      brightness: Brightness.dark,
+    );
+    final cupertinoDarkTheme = MaterialBasedCupertinoThemeData(
+      materialTheme: materialDarkTheme.copyWith(
+        cupertinoOverrideTheme: CupertinoThemeData(
+          brightness: Brightness.dark,
+          barBackgroundColor: darkDefaultCupertinoTheme.barBackgroundColor,
+          textTheme: CupertinoTextThemeData(
+            primaryColor: Colors.white,
+            navActionTextStyle: darkDefaultCupertinoTheme
+                .textTheme
+                .navActionTextStyle
+                .copyWith(color: const Color(0xF0F9F9F9)),
+            navLargeTitleTextStyle: darkDefaultCupertinoTheme
+                .textTheme
+                .navLargeTitleTextStyle
+                .copyWith(color: const Color(0xF0F9F9F9)),
           ),
-          child: PlatformProvider(
-            builder: (context) => PlatformApp.router(
-              localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-                DefaultMaterialLocalizations.delegate,
-                DefaultWidgetsLocalizations.delegate,
-                DefaultCupertinoLocalizations.delegate,
-              ],
-              title: 'Posts App',
+        ),
+      ),
+    );
+    final cupertinoLightTheme = MaterialBasedCupertinoThemeData(
+      materialTheme: materialLightTheme,
+    );
+
+    return RouteStateScope(
+      notifier: _routeState,
+      child: PlatformProvider(
+        builder: (context) => PlatformTheme(
+          themeMode: themeMode,
+          materialLightTheme: materialLightTheme,
+          materialDarkTheme: materialDarkTheme,
+          cupertinoLightTheme: cupertinoLightTheme,
+          cupertinoDarkTheme: cupertinoDarkTheme,
+          matchCupertinoSystemChromeBrightness: true,
+          onThemeModeChanged: (newThemeMode) {
+            setState(() {
+              themeMode = newThemeMode;
+            });
+          },
+          builder: (context) => PlatformApp.router(
+            localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+              DefaultMaterialLocalizations.delegate,
+              DefaultWidgetsLocalizations.delegate,
+              DefaultCupertinoLocalizations.delegate,
+            ],
+            title: 'Posts App',
+            material: (_, _) => MaterialAppRouterData(
               routeInformationParser: _routeParser,
               routerDelegate: _routerDelegate,
+              theme: materialLightTheme,
+              darkTheme: materialDarkTheme,
+              themeMode: themeMode,
+            ),
+            cupertino: (_, _) => CupertinoAppRouterData(
+              routeInformationParser: _routeParser,
+              routerDelegate: _routerDelegate,
+              theme: themeMode == ThemeMode.dark
+                  ? cupertinoDarkTheme
+                  : cupertinoLightTheme,
             ),
           ),
         ),
-      );
+      ),
+    );
+  }
 }
