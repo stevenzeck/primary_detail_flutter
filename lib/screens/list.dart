@@ -13,12 +13,18 @@ class PostsListScreen extends StatefulWidget {
 }
 
 class PostsListState extends State<PostsListScreen> {
-  Future<List<Post>>? futurePosts;
+  Future<List<Post>>? _futurePosts;
 
   @override
   void initState() {
     super.initState();
-    futurePosts = PostDatabase.db.posts();
+    _fetchPosts();
+  }
+
+  void _fetchPosts() {
+    setState(() {
+      _futurePosts = PostDatabase.db.posts();
+    });
   }
 
   @override
@@ -26,22 +32,65 @@ class PostsListState extends State<PostsListScreen> {
     return PlatformScaffold(
       appBar: PlatformAppBar(
         title: const Text("Posts"),
+        trailingActions: <Widget>[
+          PlatformIconButton(
+            icon: Icon(PlatformIcons(context).refresh),
+            onPressed: _fetchPosts,
+          ),
+        ],
         automaticallyImplyLeading: true,
       ),
       body: FutureBuilder<List<Post>>(
-        future: futurePosts,
+        future: _futurePosts,
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: PlatformCircularProgressIndicator());
+          } else if (snapshot.hasData) {
             List<Post> posts = snapshot.data!;
-            return PostList(
-              posts: posts,
-              onTap: _handlePostTapped,
-            );
+            return PostList(posts: posts, onTap: _handlePostTapped);
           } else if (snapshot.hasError) {
             var error = snapshot.error.toString();
-            return Center(child: Text(error));
+            if (error.startsWith("Exception: ")) {
+              error = error.substring("Exception: ".length);
+            }
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      PlatformIcons(context).error,
+                      size: 50,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Failed to load posts:",
+                      style: platformThemeData(
+                        context,
+                        material: (data) => data.textTheme.titleMedium,
+                        cupertino: (data) => data.textTheme.navTitleTextStyle,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      error,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                    const SizedBox(height: 20),
+                    PlatformTextButton(
+                      onPressed: _fetchPosts,
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            );
           } else {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: Text("No posts available."));
           }
         },
       ),
