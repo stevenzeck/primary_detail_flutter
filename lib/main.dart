@@ -41,8 +41,8 @@ class _PostsAppState extends State<PostsApp> {
 
   @override
   Widget build(BuildContext context) {
-    final materialLightTheme = ThemeData.light();
-    final materialDarkTheme = ThemeData.dark();
+    final materialLightTheme = ThemeData.light(useMaterial3: true);
+    final materialDarkTheme = ThemeData.dark(useMaterial3: true);
     const darkDefaultCupertinoTheme = CupertinoThemeData(
       brightness: Brightness.dark,
     );

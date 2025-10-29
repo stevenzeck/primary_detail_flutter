@@ -36,6 +36,22 @@ class PostRouterDelegate extends RouterDelegate<PostRoutePath>
   @override
   PostRoutePath get currentConfiguration => routeState.route;
 
+  @override
+  Future<bool> popRoute() async {
+    final navigator = navigatorKey.currentState;
+    if (navigator == null) {
+      return SynchronousFuture<bool>(false);
+    }
+
+    final didPop = await navigator.maybePop();
+
+    if (didPop) {
+      routeState.route = PostRoutePath('/posts', '/posts', {}, {});
+      return true;
+    }
+    return false;
+  }
+
   // Clean up resources and remove the listener when the delegate is disposed
   @override
   void dispose() {
