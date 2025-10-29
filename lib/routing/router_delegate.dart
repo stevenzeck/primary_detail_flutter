@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:primary_detail_flutter/widgets/adaptive_layout.dart';
 import 'package:flutter/widgets.dart';
 
 import '../routing.dart';
@@ -39,17 +41,36 @@ class PostRouterDelegate extends RouterDelegate<PostRoutePath>
   @override
   Future<bool> popRoute() async {
     final navigator = navigatorKey.currentState;
-    if (navigator == null) {
+    final currentNavigator = navigator;
+    if (currentNavigator == null) {
       return SynchronousFuture<bool>(false);
     }
 
-    final didPop = await navigator.maybePop();
+    final context = currentNavigator.context;
 
-    if (didPop) {
-      routeState.route = PostRoutePath('/posts', '/posts', {}, {});
-      return true;
+    if (!context.mounted) {
+      return SynchronousFuture<bool>(false);
     }
-    return false;
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isLargeScreen = screenWidth >= kMinWidthForLargeScreen;
+    final currentPath = routeState.route.pathTemplate;
+
+    if (isLargeScreen) {
+      if (currentPath == '/post/:postId') {
+        routeState.route = PostRoutePath('/posts', '/posts', {}, {});
+        return true;
+      }
+      return false;
+    }
+    else {
+      final didPop = await currentNavigator.maybePop();
+      if (didPop) {
+        routeState.route = PostRoutePath('/posts', '/posts', {}, {});
+        return true;
+      }
+      return false;
+    }
   }
 
   // Clean up resources and remove the listener when the delegate is disposed

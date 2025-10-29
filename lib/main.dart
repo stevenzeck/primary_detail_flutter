@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:primary_detail_flutter/screens/navigator.dart';
+import 'package:primary_detail_flutter/widgets/adaptive_layout.dart';
 
 import 'routing.dart';
 
@@ -34,7 +35,7 @@ class _PostsAppState extends State<PostsApp> {
     _routerDelegate = PostRouterDelegate(
       routeState: _routeState,
       navigatorKey: _navigatorKey,
-      builder: (context) => PostNavigator(navigatorKey: _navigatorKey),
+      builder: (context) => AdaptiveLayout(navigatorKey: _navigatorKey),
     );
     super.initState();
   }
