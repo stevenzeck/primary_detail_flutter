@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:primary_detail_flutter/main.dart';
 
 import '../model/post.dart';
 import '../routing/route_state.dart';
@@ -18,12 +19,26 @@ class PostsListState extends State<PostsListScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchPosts();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_futurePosts == null) {
+      _fetchPosts();
+    }
   }
 
   void _fetchPosts() {
     setState(() {
-      _futurePosts = PostDatabase.db.posts();
+      _futurePosts = RepositoryProvider.of(context).getPosts();
+    });
+  }
+
+  /// Refreshes the posts from the network
+  void _refreshPosts() {
+    setState(() {
+      _futurePosts = RepositoryProvider.of(context).refreshPosts();
     });
   }
 
@@ -35,7 +50,7 @@ class PostsListState extends State<PostsListScreen> {
         trailingActions: <Widget>[
           PlatformIconButton(
             icon: Icon(PlatformIcons(context).refresh),
-            onPressed: _fetchPosts,
+            onPressed: _refreshPosts,
           ),
         ],
         automaticallyImplyLeading: true,
@@ -82,7 +97,7 @@ class PostsListState extends State<PostsListScreen> {
                     ),
                     const SizedBox(height: 20),
                     PlatformTextButton(
-                      onPressed: _fetchPosts,
+                      onPressed: _refreshPosts,
                       child: const Text('Retry'),
                     ),
                   ],
@@ -103,7 +118,7 @@ class PostsListState extends State<PostsListScreen> {
     setState(() {
       post.isread = true;
     });
-    PostDatabase.db.updatePost(post);
+    RepositoryProvider.of(context).updatePost(post);
     _routeState.go('/post/${post.id}');
   }
 }

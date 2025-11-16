@@ -9,7 +9,6 @@ class HttpService {
   final Uri postsURL = Uri.https("jsonplaceholder.typicode.com", "/posts");
 
   Future<List<Post>> getPosts() async {
-    // Handle network exceptions and response errors
     try {
       Response res = await get(postsURL).timeout(const Duration(seconds: 10));
 
@@ -18,7 +17,7 @@ class HttpService {
 
         // Convert the dynamic list to a list of Post objects
         List<Post> posts = body
-            .map((dynamic item) => Post.fromMap(item))
+            .map((dynamic item) => Post.fromJson(item))
             .toList();
 
         return posts;

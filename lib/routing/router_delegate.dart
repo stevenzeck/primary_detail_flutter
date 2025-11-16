@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:primary_detail_flutter/widgets/adaptive_layout.dart';
 import 'package:flutter/widgets.dart';
+import 'package:primary_detail_flutter/widgets/adaptive_layout.dart';
 
 import '../routing.dart';
 
@@ -62,8 +62,7 @@ class PostRouterDelegate extends RouterDelegate<PostRoutePath>
         return true;
       }
       return false;
-    }
-    else {
+    } else {
       final didPop = await currentNavigator.maybePop();
       if (didPop) {
         routeState.route = PostRoutePath('/posts', '/posts', {}, {});

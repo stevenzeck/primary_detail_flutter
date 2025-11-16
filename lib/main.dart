@@ -1,13 +1,38 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:primary_detail_flutter/screens/navigator.dart';
+import 'package:primary_detail_flutter/model/post_repository.dart';
+import 'package:primary_detail_flutter/services/database_service.dart';
+import 'package:primary_detail_flutter/services/http_service.dart';
 import 'package:primary_detail_flutter/widgets/adaptive_layout.dart';
 
 import 'routing.dart';
 
 void main() {
   runApp(const PostsApp());
+}
+
+class RepositoryProvider extends InheritedWidget {
+  final PostRepository repository;
+
+  const RepositoryProvider({
+    super.key,
+    required this.repository,
+    required super.child,
+  });
+
+  static PostRepository of(BuildContext context) {
+    final provider = context
+        .dependOnInheritedWidgetOfExactType<RepositoryProvider>();
+    if (provider == null) {
+      throw Exception('RepositoryProvider not found in context');
+    }
+    return provider.repository;
+  }
+
+  @override
+  bool updateShouldNotify(RepositoryProvider oldWidget) =>
+      repository != oldWidget.repository;
 }
 
 class PostsApp extends StatefulWidget {
@@ -23,10 +48,18 @@ class _PostsAppState extends State<PostsApp> {
   late final PostRouterDelegate _routerDelegate;
   late final PostRouteInformationParser _routeParser;
 
+  late final HttpService _httpService;
+  late final PostDatabase _database;
+  late final PostRepository _postRepository;
+
   ThemeMode? themeMode = ThemeMode.system;
 
   @override
   void initState() {
+    _httpService = HttpService();
+    _database = PostDatabase.db;
+    _postRepository = PostRepository(_httpService, _database);
+
     _routeParser = PostRouteInformationParser(
       allowedPaths: ['/posts', '/post/:postId'],
       initialRoute: '/posts',
@@ -70,41 +103,44 @@ class _PostsAppState extends State<PostsApp> {
       materialTheme: materialLightTheme,
     );
 
-    return RouteStateScope(
-      notifier: _routeState,
-      child: PlatformProvider(
-        builder: (context) => PlatformTheme(
-          themeMode: themeMode,
-          materialLightTheme: materialLightTheme,
-          materialDarkTheme: materialDarkTheme,
-          cupertinoLightTheme: cupertinoLightTheme,
-          cupertinoDarkTheme: cupertinoDarkTheme,
-          matchCupertinoSystemChromeBrightness: true,
-          onThemeModeChanged: (newThemeMode) {
-            setState(() {
-              themeMode = newThemeMode;
-            });
-          },
-          builder: (context) => PlatformApp.router(
-            localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-              DefaultMaterialLocalizations.delegate,
-              DefaultWidgetsLocalizations.delegate,
-              DefaultCupertinoLocalizations.delegate,
-            ],
-            title: 'Posts App',
-            material: (_, _) => MaterialAppRouterData(
-              routeInformationParser: _routeParser,
-              routerDelegate: _routerDelegate,
-              theme: materialLightTheme,
-              darkTheme: materialDarkTheme,
-              themeMode: themeMode,
-            ),
-            cupertino: (_, _) => CupertinoAppRouterData(
-              routeInformationParser: _routeParser,
-              routerDelegate: _routerDelegate,
-              theme: themeMode == ThemeMode.dark
-                  ? cupertinoDarkTheme
-                  : cupertinoLightTheme,
+    return RepositoryProvider(
+      repository: _postRepository,
+      child: RouteStateScope(
+        notifier: _routeState,
+        child: PlatformProvider(
+          builder: (context) => PlatformTheme(
+            themeMode: themeMode,
+            materialLightTheme: materialLightTheme,
+            materialDarkTheme: materialDarkTheme,
+            cupertinoLightTheme: cupertinoLightTheme,
+            cupertinoDarkTheme: cupertinoDarkTheme,
+            matchCupertinoSystemChromeBrightness: true,
+            onThemeModeChanged: (newThemeMode) {
+              setState(() {
+                themeMode = newThemeMode;
+              });
+            },
+            builder: (context) => PlatformApp.router(
+              localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+                DefaultMaterialLocalizations.delegate,
+                DefaultWidgetsLocalizations.delegate,
+                DefaultCupertinoLocalizations.delegate,
+              ],
+              title: 'Posts App',
+              material: (_, _) => MaterialAppRouterData(
+                routeInformationParser: _routeParser,
+                routerDelegate: _routerDelegate,
+                theme: materialLightTheme,
+                darkTheme: materialDarkTheme,
+                themeMode: themeMode,
+              ),
+              cupertino: (_, _) => CupertinoAppRouterData(
+                routeInformationParser: _routeParser,
+                routerDelegate: _routerDelegate,
+                theme: themeMode == ThemeMode.dark
+                    ? cupertinoDarkTheme
+                    : cupertinoLightTheme,
+              ),
             ),
           ),
         ),

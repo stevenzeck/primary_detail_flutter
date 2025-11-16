@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:primary_detail_flutter/main.dart';
 
 import '../model/post.dart';
 import '../routing/route_state.dart';
@@ -17,6 +18,9 @@ class PostNavigator extends StatefulWidget {
 class _PostNavigatorState extends State<PostNavigator> {
   final _postDetailsKey = const ValueKey('Post details screens');
 
+  Future<Post?>? _postFuture;
+  int? _currentPostId;
+
   void _handlePageRemoved(Page<dynamic> page) {
     if (page.key == _postDetailsKey) {
       RouteStateScope.of(context).go('/posts');
@@ -24,16 +28,32 @@ class _PostNavigatorState extends State<PostNavigator> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
     final routeState = RouteStateScope.of(context);
     final pathTemplate = routeState.route.pathTemplate;
+    final postIdParam = routeState.route.parameters['postId'];
+    int? selectedPostId;
 
-    Future<Post>? selectedPost;
-    if (pathTemplate == '/post/:postId') {
-      int postId = int.parse(routeState.route.parameters['postId']!);
-      selectedPost = PostDatabase.db.getPost(postId);
+    if (pathTemplate == '/post/:postId' && postIdParam != null) {
+      selectedPostId = int.tryParse(postIdParam);
     }
 
+    if (selectedPostId != _currentPostId) {
+      setState(() {
+        _currentPostId = selectedPostId;
+        if (selectedPostId != null) {
+          _postFuture = RepositoryProvider.of(context).getPost(selectedPostId);
+        } else {
+          _postFuture = null;
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Navigator(
       key: widget.navigatorKey,
       onDidRemovePage: _handlePageRemoved,
@@ -43,19 +63,22 @@ class _PostNavigatorState extends State<PostNavigator> {
           child: const PostsListScreen(),
           context: context,
         ),
-        if (selectedPost != null)
+        if (_postFuture != null)
           platformPage(
-            key: const ValueKey('PostDetailPage'),
-            child: FutureBuilder<Post>(
-              future: selectedPost,
+            key: _postDetailsKey,
+            child: FutureBuilder<Post?>(
+              future: _postFuture,
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return DetailPage(item: snapshot.data!);
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: PlatformCircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  var error = snapshot.error.toString();
-                  return Center(child: Text(error));
+                  return Center(
+                    child: Text('Error loading post: ${snapshot.error}'),
+                  );
+                } else if (snapshot.hasData && snapshot.data != null) {
+                  return DetailPage(item: snapshot.data!);
                 } else {
-                  return const Center(child: Text("Loading post..."));
+                  return const Center(child: Text('Post not found.'));
                 }
               },
             ),
