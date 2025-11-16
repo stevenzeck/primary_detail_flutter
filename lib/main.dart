@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:primary_detail_flutter/model/post_repository.dart';
 import 'package:primary_detail_flutter/services/database_service.dart';
 import 'package:primary_detail_flutter/services/http_service.dart';
+import 'package:primary_detail_flutter/themes.dart';
 import 'package:primary_detail_flutter/widgets/adaptive_layout.dart';
 
 void main() {
@@ -87,43 +88,15 @@ class _PostsAppState extends State<PostsApp> {
 
   @override
   Widget build(BuildContext context) {
-    final materialLightTheme = ThemeData.light(useMaterial3: true);
-    final materialDarkTheme = ThemeData.dark(useMaterial3: true);
-    const darkDefaultCupertinoTheme = CupertinoThemeData(
-      brightness: Brightness.dark,
-    );
-    final cupertinoDarkTheme = MaterialBasedCupertinoThemeData(
-      materialTheme: materialDarkTheme.copyWith(
-        cupertinoOverrideTheme: CupertinoThemeData(
-          brightness: Brightness.dark,
-          barBackgroundColor: darkDefaultCupertinoTheme.barBackgroundColor,
-          textTheme: CupertinoTextThemeData(
-            primaryColor: Colors.white,
-            navActionTextStyle: darkDefaultCupertinoTheme
-                .textTheme
-                .navActionTextStyle
-                .copyWith(color: const Color(0xF0F9F9F9)),
-            navLargeTitleTextStyle: darkDefaultCupertinoTheme
-                .textTheme
-                .navLargeTitleTextStyle
-                .copyWith(color: const Color(0xF0F9F9F9)),
-          ),
-        ),
-      ),
-    );
-    final cupertinoLightTheme = MaterialBasedCupertinoThemeData(
-      materialTheme: materialLightTheme,
-    );
-
     return RepositoryProvider(
       repository: _postRepository,
       child: PlatformProvider(
         builder: (context) => PlatformTheme(
           themeMode: themeMode,
-          materialLightTheme: materialLightTheme,
-          materialDarkTheme: materialDarkTheme,
-          cupertinoLightTheme: cupertinoLightTheme,
-          cupertinoDarkTheme: cupertinoDarkTheme,
+          materialLightTheme: AppThemes.materialLightTheme,
+          materialDarkTheme: AppThemes.materialDarkTheme,
+          cupertinoLightTheme: AppThemes.cupertinoLightTheme,
+          cupertinoDarkTheme: AppThemes.cupertinoDarkTheme,
           matchCupertinoSystemChromeBrightness: true,
           onThemeModeChanged: (newThemeMode) {
             setState(() {
@@ -141,8 +114,8 @@ class _PostsAppState extends State<PostsApp> {
               routeInformationParser: _router.routeInformationParser,
               routerDelegate: _router.routerDelegate,
               routeInformationProvider: _router.routeInformationProvider,
-              theme: materialLightTheme,
-              darkTheme: materialDarkTheme,
+              theme: AppThemes.materialLightTheme,
+              darkTheme: AppThemes.materialDarkTheme,
               themeMode: themeMode,
             ),
             cupertino: (_, _) => CupertinoAppRouterData(
@@ -150,8 +123,8 @@ class _PostsAppState extends State<PostsApp> {
               routerDelegate: _router.routerDelegate,
               routeInformationProvider: _router.routeInformationProvider,
               theme: themeMode == ThemeMode.dark
-                  ? cupertinoDarkTheme
-                  : cupertinoLightTheme,
+                  ? AppThemes.cupertinoDarkTheme
+                  : AppThemes.cupertinoLightTheme,
             ),
           ),
         ),
