@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:go_router/go_router.dart';
 import 'package:primary_detail_flutter/main.dart';
 
 import '../model/post.dart';
-import '../routing/route_state.dart';
 import '../widgets/post_list.dart';
 
 class PostsListScreen extends StatefulWidget {
@@ -35,7 +35,6 @@ class PostsListState extends State<PostsListScreen> {
     });
   }
 
-  /// Refreshes the posts from the network
   void _refreshPosts() {
     setState(() {
       _futurePosts = RepositoryProvider.of(context).refreshPosts();
@@ -112,13 +111,11 @@ class PostsListState extends State<PostsListScreen> {
     );
   }
 
-  RouteState get _routeState => RouteStateScope.of(context);
-
   void _handlePostTapped(Post post) {
     setState(() {
       post.isread = true;
     });
     RepositoryProvider.of(context).updatePost(post);
-    _routeState.go('/post/${post.id}');
+    context.push('/post/${post.id}');
   }
 }

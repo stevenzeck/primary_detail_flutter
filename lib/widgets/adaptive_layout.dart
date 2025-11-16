@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:go_router/go_router.dart';
 import 'package:primary_detail_flutter/main.dart';
 import 'package:primary_detail_flutter/model/post.dart';
-import 'package:primary_detail_flutter/routing.dart';
 import 'package:primary_detail_flutter/screens.dart';
+import 'package:primary_detail_flutter/screens/post_detail_fetcher.dart';
 
 const double kMinWidthForLargeScreen = 600.0;
 
 class AdaptiveLayout extends StatefulWidget {
-  final GlobalKey<NavigatorState> navigatorKey;
+  final int? selectedPostId;
 
-  const AdaptiveLayout({required this.navigatorKey, super.key});
+  const AdaptiveLayout({this.selectedPostId, super.key});
 
   @override
   State<AdaptiveLayout> createState() => _AdaptiveLayoutState();
@@ -18,31 +19,37 @@ class AdaptiveLayout extends StatefulWidget {
 
 class _AdaptiveLayoutState extends State<AdaptiveLayout> {
   Future<Post?>? _postFuture;
-  int? _currentPostId;
+  bool _isInitialLoad = true;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    final routeState = RouteStateScope.of(context);
-    final pathTemplate = routeState.route.pathTemplate;
-    final postIdParam = routeState.route.parameters['postId'];
-    int? selectedPostId;
-
-    if (pathTemplate == '/post/:postId' && postIdParam != null) {
-      selectedPostId = int.tryParse(postIdParam);
+    if (_isInitialLoad) {
+      _isInitialLoad = false;
+      _postFuture = _getPostFuture(widget.selectedPostId);
     }
+  }
 
-    if (selectedPostId != _currentPostId) {
+  @override
+  void didUpdateWidget(covariant AdaptiveLayout oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedPostId != widget.selectedPostId) {
       setState(() {
-        _currentPostId = selectedPostId;
-        if (selectedPostId != null) {
-          _postFuture = RepositoryProvider.of(context).getPost(selectedPostId);
-        } else {
-          _postFuture = null;
-        }
+        _postFuture = _getPostFuture(widget.selectedPostId);
       });
     }
+  }
+
+  Future<Post?>? _getPostFuture(int? postId) {
+    if (postId == null) {
+      return null;
+    }
+    return RepositoryProvider.of(context).getPost(postId);
   }
 
   @override
@@ -50,37 +57,41 @@ class _AdaptiveLayoutState extends State<AdaptiveLayout> {
     final screenWidth = MediaQuery.of(context).size.width;
     bool isLargeScreen = screenWidth >= kMinWidthForLargeScreen;
 
+    Widget detailView = _postFuture != null
+        ? PostDetailFetcher(postFuture: _postFuture!)
+        : const Center(child: Text('Select a post to see details'));
+
     if (isLargeScreen) {
       return Row(
         children: [
           const Expanded(flex: 1, child: PostsListScreen()),
-          Expanded(
-            flex: 2,
-            child: _postFuture != null
-                ? FutureBuilder<Post?>(
-                    future: _postFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
-                          child: PlatformCircularProgressIndicator(),
-                        );
-                      } else if (snapshot.hasError) {
-                        return Center(
-                          child: Text('Error loading post: ${snapshot.error}'),
-                        );
-                      } else if (snapshot.hasData && snapshot.data != null) {
-                        return DetailPage(item: snapshot.data!);
-                      } else {
-                        return const Center(child: Text('Post not found.'));
-                      }
-                    },
-                  )
-                : const Center(child: Text('Select a post to see details')),
-          ),
+          Expanded(flex: 2, child: detailView),
         ],
       );
     } else {
-      return PostNavigator(navigatorKey: widget.navigatorKey);
+      return PopScope(
+        canPop: widget.selectedPostId == null,
+        onPopInvokedWithResult: (bool didPop, dynamic result) {
+          if (!didPop) {
+            context.pop();
+          }
+        },
+        child: Navigator(
+          pages: [
+            platformPage(
+              context: context,
+              key: const ValueKey('PostsListPage'),
+              child: const PostsListScreen(),
+            ),
+            if (widget.selectedPostId != null)
+              platformPage(
+                context: context,
+                key: ValueKey('PostDetailPage-${widget.selectedPostId}'),
+                child: detailView,
+              ),
+          ],
+        ),
+      );
     }
   }
 }
