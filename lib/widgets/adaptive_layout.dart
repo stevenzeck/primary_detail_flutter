@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:go_router/go_router.dart';
 import 'package:primary_detail_flutter/main.dart';
 import 'package:primary_detail_flutter/model/post.dart';
 import 'package:primary_detail_flutter/screens.dart';
@@ -69,29 +67,11 @@ class _AdaptiveLayoutState extends State<AdaptiveLayout> {
         ],
       );
     } else {
-      return PopScope(
-        canPop: widget.selectedPostId == null,
-        onPopInvokedWithResult: (bool didPop, dynamic result) {
-          if (!didPop) {
-            context.pop();
-          }
-        },
-        child: Navigator(
-          pages: [
-            platformPage(
-              context: context,
-              key: const ValueKey('PostsListPage'),
-              child: const PostsListScreen(),
-            ),
-            if (widget.selectedPostId != null)
-              platformPage(
-                context: context,
-                key: ValueKey('PostDetailPage-${widget.selectedPostId}'),
-                child: detailView,
-              ),
-          ],
-        ),
-      );
+      if (widget.selectedPostId == null) {
+        return const PostsListScreen();
+      } else {
+        return detailView;
+      }
     }
   }
 }
