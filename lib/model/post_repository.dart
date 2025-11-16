@@ -22,19 +22,39 @@ class PostRepository {
     return posts;
   }
 
-  /// Used in pull to refresh.
   Future<List<Post>> refreshPosts() async {
     final posts = await _httpService.getPosts();
 
-    await _database.deleteAllPosts();
+    final existingPosts = await _database.getPosts();
+    final Map<int, Post> existingPostsMap = {
+      for (var post in existingPosts) post.id: post,
+    };
+
+    for (var newPost in posts) {
+      if (existingPostsMap.containsKey(newPost.id)) {
+        newPost.isread = existingPostsMap[newPost.id]!.isread;
+      }
+    }
+
     await _database.insertPosts(posts);
 
     return posts;
   }
 
   /// Gets a single post from the database.
-  Future<Post?> getPost(int postId) {
-    return _database.getPost(postId);
+  /// If not found, fetches from the network.
+  Future<Post?> getPost(int postId) async {
+    Post? post = await _database.getPost(postId);
+
+    if (post == null) {
+      try {
+        post = await _httpService.getPost(postId);
+        await _database.insertPosts([post]);
+      } catch (e) {
+        return null;
+      }
+    }
+    return post;
   }
 
   /// Updates a post in the database.

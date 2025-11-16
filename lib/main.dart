@@ -2,37 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:primary_detail_flutter/model/post_notifier.dart';
 import 'package:primary_detail_flutter/model/post_repository.dart';
 import 'package:primary_detail_flutter/services/database_service.dart';
 import 'package:primary_detail_flutter/services/http_service.dart';
 import 'package:primary_detail_flutter/themes.dart';
 import 'package:primary_detail_flutter/widgets/adaptive_layout.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const PostsApp());
-}
-
-class RepositoryProvider extends InheritedWidget {
-  final PostRepository repository;
-
-  const RepositoryProvider({
-    super.key,
-    required this.repository,
-    required super.child,
-  });
-
-  static PostRepository of(BuildContext context) {
-    final provider = context
-        .dependOnInheritedWidgetOfExactType<RepositoryProvider>();
-    if (provider == null) {
-      throw Exception('RepositoryProvider not found in context');
-    }
-    return provider.repository;
-  }
-
-  @override
-  bool updateShouldNotify(RepositoryProvider oldWidget) =>
-      repository != oldWidget.repository;
 }
 
 class PostsApp extends StatefulWidget {
@@ -44,18 +23,11 @@ class PostsApp extends StatefulWidget {
 
 class _PostsAppState extends State<PostsApp> {
   late final GoRouter _router;
-  late final HttpService _httpService;
-  late final PostDatabase _database;
-  late final PostRepository _postRepository;
 
   ThemeMode? themeMode = ThemeMode.system;
 
   @override
   void initState() {
-    _httpService = HttpService();
-    _database = PostDatabase.db;
-    _postRepository = PostRepository(_httpService, _database);
-
     _router = GoRouter(
       initialLocation: '/posts',
       routes: [
@@ -88,8 +60,18 @@ class _PostsAppState extends State<PostsApp> {
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider(
-      repository: _postRepository,
+    return MultiProvider(
+      providers: [
+        Provider(create: (_) => HttpService()),
+        Provider(create: (_) => PostDatabase.db),
+        ProxyProvider2<HttpService, PostDatabase, PostRepository>(
+          update: (_, http, db, previous) => PostRepository(http, db),
+        ),
+        ChangeNotifierProxyProvider<PostRepository, PostNotifier>(
+          create: (context) => PostNotifier(context.read<PostRepository>()),
+          update: (_, repo, previous) => PostNotifier(repo),
+        ),
+      ],
       child: PlatformProvider(
         builder: (context) => PlatformTheme(
           themeMode: themeMode,

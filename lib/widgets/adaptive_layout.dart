@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:primary_detail_flutter/main.dart';
-import 'package:primary_detail_flutter/model/post.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:primary_detail_flutter/model/post_notifier.dart';
 import 'package:primary_detail_flutter/screens.dart';
-import 'package:primary_detail_flutter/screens/post_detail_fetcher.dart';
+import 'package:provider/provider.dart';
 
 const double kMinWidthForLargeScreen = 600.0;
 
@@ -16,20 +16,17 @@ class AdaptiveLayout extends StatefulWidget {
 }
 
 class _AdaptiveLayoutState extends State<AdaptiveLayout> {
-  Future<Post?>? _postFuture;
-  bool _isInitialLoad = true;
-
   @override
   void initState() {
     super.initState();
+    _updateNotifier(widget.selectedPostId);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_isInitialLoad) {
-      _isInitialLoad = false;
-      _postFuture = _getPostFuture(widget.selectedPostId);
+    if (widget.selectedPostId != null) {
+      _updateNotifier(widget.selectedPostId);
     }
   }
 
@@ -37,17 +34,16 @@ class _AdaptiveLayoutState extends State<AdaptiveLayout> {
   void didUpdateWidget(covariant AdaptiveLayout oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.selectedPostId != widget.selectedPostId) {
-      setState(() {
-        _postFuture = _getPostFuture(widget.selectedPostId);
-      });
+      _updateNotifier(widget.selectedPostId);
     }
   }
 
-  Future<Post?>? _getPostFuture(int? postId) {
-    if (postId == null) {
-      return null;
-    }
-    return RepositoryProvider.of(context).getPost(postId);
+  void _updateNotifier(int? postId) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<PostNotifier>().selectPost(postId);
+      }
+    });
   }
 
   @override
@@ -55,9 +51,16 @@ class _AdaptiveLayoutState extends State<AdaptiveLayout> {
     final screenWidth = MediaQuery.of(context).size.width;
     bool isLargeScreen = screenWidth >= kMinWidthForLargeScreen;
 
-    Widget detailView = _postFuture != null
-        ? PostDetailFetcher(postFuture: _postFuture!)
-        : const Center(child: Text('Select a post to see details'));
+    final selectedPost = context.watch<PostNotifier>().selectedPost;
+
+    Widget detailView;
+    if (selectedPost != null) {
+      detailView = DetailPage(item: selectedPost);
+    } else if (widget.selectedPostId != null) {
+      detailView = const Center(child: PlatformCircularProgressIndicator());
+    } else {
+      detailView = const Center(child: Text('Select a post to see details'));
+    }
 
     if (isLargeScreen) {
       return Row(
