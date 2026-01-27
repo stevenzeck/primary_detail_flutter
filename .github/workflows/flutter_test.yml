@@ -44,5 +44,5 @@ jobs:
 
       - name: Display coverage summary
         run: |
-          lcov --remove coverage/lcov.info 'lib/**/*.g.dart' 'test/**/*.mocks.dart' -o coverage/lcov.info
+          lcov --remove coverage/lcov.info 'lib/**/*.g.dart' -o coverage/lcov.info
           lcov --summary coverage/lcov.info
