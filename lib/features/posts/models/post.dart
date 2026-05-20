@@ -25,6 +25,7 @@ class Post {
   /// Indicates whether the post has been read by the user.
   ///
   /// This field is converted from/to an integer for database storage.
+  @JsonKey(fromJson: _isReadFromDb, toJson: _isReadToDb)
   final bool isRead;
 
   /// Creates a [Post] instance.
@@ -33,7 +34,7 @@ class Post {
     required this.userId,
     required this.title,
     required this.body,
-    @JsonKey(fromJson: _isReadFromDb, toJson: _isReadToDb) this.isRead = false,
+    this.isRead = false,
   });
 
   /// Creates a copy of this [Post] with the given fields replaced with the new values.
