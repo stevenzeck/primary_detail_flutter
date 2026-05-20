@@ -10,7 +10,10 @@ import '../services/http_service.dart';
 // Initialize the singleton instances for services and repositories.
 final _httpService = HttpService(baseUrl: 'jsonplaceholder.typicode.com');
 final _postDatabase = PostDatabase.db;
-final _postRepository = PostRepository(_httpService, _postDatabase);
+final _postRepository = PostRepository(
+  httpService: _httpService,
+  database: _postDatabase,
+);
 
 /// Returns the list of providers used in the application.
 List<SingleChildWidget> get appProviders {
@@ -19,7 +22,7 @@ List<SingleChildWidget> get appProviders {
     Provider<PostRepository>.value(value: _postRepository),
     // Provide the PostNotifier for state management.
     ChangeNotifierProvider<PostNotifier>(
-      create: (_) => PostNotifier(_postRepository),
+      create: (_) => PostNotifier(repository: _postRepository),
     ),
     // Provie the Theme change notifier
     ChangeNotifierProvider(create: (_) => ThemeNotifier()),
@@ -29,12 +32,12 @@ List<SingleChildWidget> get appProviders {
 }
 
 class ThemeNotifier extends ChangeNotifier {
-  ThemeMode _mode = ThemeMode.system;
+  ThemeMode _mode = .system;
 
   ThemeMode get mode => _mode;
 
   void toggleTheme(bool isDark) {
-    _mode = isDark ? ThemeMode.dark : ThemeMode.light;
+    _mode = isDark ? .dark : .light;
     notifyListeners();
   }
 }

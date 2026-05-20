@@ -16,7 +16,7 @@ class PostRepository {
   final _postsStreamController = StreamController<List<Post>>.broadcast();
 
   /// Creates a [PostRepository] with dependencies.
-  PostRepository(this._httpService, this._database);
+  PostRepository({required this._httpService, required this._database});
 
   /// Exposes the stream of posts.
   Stream<List<Post>> get postsStream => _postsStreamController.stream;

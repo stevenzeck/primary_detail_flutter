@@ -88,7 +88,7 @@ void main() {
   setUp(() {
     mockHttpService = MockHttpService();
     mockDatabase = MockPostDatabase();
-    repository = PostRepository(mockHttpService, mockDatabase);
+    repository = PostRepository(httpService: mockHttpService, database: mockDatabase);
   });
 
   group('PostRepository', () {

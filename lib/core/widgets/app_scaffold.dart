@@ -24,8 +24,7 @@ class AppScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final platform = Theme.of(context).platform;
-    final isCupertino =
-        platform == TargetPlatform.iOS || platform == TargetPlatform.macOS;
+    final isCupertino = platform == .iOS || platform == .macOS;
 
     if (isCupertino) {
       return CupertinoPageScaffold(
@@ -38,9 +37,9 @@ class AppScaffold extends StatelessWidget {
           // Cupertino only takes one trailing widget, so we wrap actions in a Row
           trailing: actions != null && actions!.isNotEmpty
               ? Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: .min,
+                  crossAxisAlignment: .center,
+                  mainAxisAlignment: .end,
                   children: actions!,
                 )
               : null,

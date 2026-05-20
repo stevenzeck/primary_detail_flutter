@@ -127,7 +127,7 @@ void main() {
 
     test('initial state transitions to PostLoading then PostLoaded', () async {
       mockRepository.fetchAndEmitCompleter = Completer<void>();
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
 
       expect(notifier.state, isA<PostLoading>());
 
@@ -139,7 +139,7 @@ void main() {
 
     test('fetchPosts sets PostError on failure', () async {
       mockRepository.fetchAndEmitError = Exception('Fetch failed');
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
 
       await notifier.fetchPosts();
 
@@ -148,7 +148,7 @@ void main() {
     });
 
     test('emits PostLoaded when repository emits posts', () async {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
 
       final posts = [
         Post(
@@ -170,7 +170,7 @@ void main() {
     });
 
     test('updates selectedPost when new list is emitted', () async {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       final p1 = Post(
         id: const PostId(1),
         userId: const UserId(1),
@@ -191,7 +191,7 @@ void main() {
     });
 
     test('deselects post if it is removed from the list', () async {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       final p1 = Post(
         id: const PostId(1),
         userId: const UserId(1),
@@ -213,7 +213,7 @@ void main() {
     test('emits PostError on repository stream error', () async {
       // Use a completer to prevent fetchAndEmitPosts from emitting an empty list after the error
       mockRepository.fetchAndEmitCompleter = Completer<void>();
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
 
       mockRepository.emitError('Stream failure');
       await Future<void>.delayed(Duration.zero);
@@ -223,13 +223,13 @@ void main() {
     });
 
     test('refreshPosts calls repository refresh', () async {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       await notifier.refreshPosts();
       expect(mockRepository.refreshPostsCalled, true);
     });
 
     test('refreshPosts sets PostError on failure', () async {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       mockRepository.refreshError = Exception('Refresh failed');
 
       await notifier.refreshPosts();
@@ -239,7 +239,7 @@ void main() {
     });
 
     test('selectPost(null) deselects post', () async {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       final p1 = Post(
         id: const PostId(1),
         userId: const UserId(1),
@@ -257,7 +257,7 @@ void main() {
     });
 
     test('selectPost fetches from repository if not in current state', () async {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       final post = Post(
         id: const PostId(99),
         userId: const UserId(1),
@@ -283,7 +283,7 @@ void main() {
     });
 
     test('selectPost handles error when getPost fails', () async {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       mockRepository.emit([]);
       await Future<void>.delayed(Duration.zero);
 
@@ -297,7 +297,7 @@ void main() {
     });
 
     test('selectPost marks post as read', () async {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
 
       final posts = [
         Post(
@@ -323,7 +323,7 @@ void main() {
     });
 
     test('enterSelectionMode initializes selection correctly', () {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
 
       notifier.enterSelectionMode(1);
 
@@ -332,7 +332,7 @@ void main() {
     });
 
     test('toggleSelection adds and removes ids', () {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       notifier.enterSelectionMode(null);
 
       notifier.toggleSelection(1);
@@ -343,7 +343,7 @@ void main() {
     });
 
     test('exitSelectionMode clears selection', () {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       notifier.enterSelectionMode(1);
 
       notifier.exitSelectionMode();
@@ -353,7 +353,7 @@ void main() {
     });
 
     test('deleteSelected removes posts and exits selection mode', () async {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       final posts = [
         Post(
           id: const PostId(1),
@@ -384,7 +384,7 @@ void main() {
     });
 
     test('deleteSelected handles error', () async {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       final posts = [
         Post(
           id: const PostId(1),
@@ -407,7 +407,7 @@ void main() {
     });
 
     test('markSelectedAsRead updates posts and exits selection mode', () async {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       final posts = [
         Post(
           id: const PostId(1),
@@ -442,7 +442,7 @@ void main() {
     });
 
     test('deletePost removes single post', () async {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       final posts = [
         Post(
           id: const PostId(1),
@@ -462,7 +462,7 @@ void main() {
     });
 
     test('deletePost handles error', () async {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       final posts = [
         Post(
           id: const PostId(1),
@@ -484,7 +484,7 @@ void main() {
     });
 
     test('dispose cancels subscription', () {
-      notifier = PostNotifier(mockRepository);
+      notifier = PostNotifier(repository: mockRepository);
       notifier.dispose();
       expect(
         mockRepository.disposeCalled,

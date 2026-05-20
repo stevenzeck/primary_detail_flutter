@@ -17,7 +17,7 @@ class AdaptiveDialogAction extends StatelessWidget {
   Widget build(BuildContext context) {
     final platform = Theme.of(context).platform;
 
-    if (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
+    if (platform == .iOS || platform == .macOS) {
       return CupertinoDialogAction(
         onPressed: onPressed,
         isDestructiveAction: isDestructive,

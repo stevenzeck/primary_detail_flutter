@@ -13,7 +13,7 @@ class PostNotifier extends ChangeNotifier {
   StreamSubscription<List<Post>>? _postsSubscription;
 
   /// Creates a [PostNotifier] and initializes data fetching.
-  PostNotifier(this._repository) {
+  PostNotifier({required this._repository}) {
     _init();
   }
 
@@ -98,7 +98,7 @@ class PostNotifier extends ChangeNotifier {
     }
 
     // Optimistically select from current list if available.
-    if (_state case PostLoaded(posts: final posts)) {
+    if (_state case PostLoaded(:final posts)) {
       final postFromList = posts.firstWhereOrNull((p) => p.id == postId);
       if (postFromList != null) {
         _selectedPost = postFromList;
@@ -191,7 +191,7 @@ class PostNotifier extends ChangeNotifier {
   Future<void> markSelectedAsRead() async {
     if (_selectedIds.isEmpty) return;
 
-    if (_state case PostLoaded(posts: final posts)) {
+    if (_state case PostLoaded(:final posts)) {
       final postsToUpdate = posts
           .where((p) => _selectedIds.contains(p.id) && !p.isRead)
           .toList();

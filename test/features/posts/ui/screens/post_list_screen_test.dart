@@ -20,7 +20,7 @@ void main() {
     mockRepository = MockPostRepository();
     // Prevent the mock from emitting immediately so we can catch the loading state
     mockRepository.fetchAndEmitCompleter = Completer<void>();
-    postNotifier = PostNotifier(mockRepository);
+    postNotifier = PostNotifier(repository: mockRepository);
   });
 
   Widget createWidgetUnderTest({

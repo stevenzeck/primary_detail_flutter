@@ -25,8 +25,7 @@ class PostsListScreen extends StatelessWidget {
         .watch<PostNotifier>();
     final selectedCount = selectedIds.length;
     final platform = Theme.of(context).platform;
-    final isCupertinoMode =
-        platform == TargetPlatform.iOS || platform == TargetPlatform.macOS;
+    final isCupertinoMode = platform == .iOS || platform == .macOS;
     final isMaterialMode = !isCupertinoMode;
 
     // Android-specific AppBar when in selection mode
@@ -172,14 +171,13 @@ class _PostListBody extends StatelessWidget {
     final state = context.select<PostNotifier, PostState>((n) => n.state);
 
     final platform = Theme.of(context).platform;
-    final isCupertino =
-        platform == TargetPlatform.iOS || platform == TargetPlatform.macOS;
+    final isCupertino = platform == .iOS || platform == .macOS;
 
     return switch (state) {
       PostInitial() || PostLoading() => const Center(
         child: CircularProgressIndicator.adaptive(),
       ),
-      PostError(message: final msg) => Center(
+      PostError(:final message) => Center(
         child: Column(
           mainAxisAlignment: .center,
           children: [
@@ -190,7 +188,7 @@ class _PostListBody extends StatelessWidget {
               size: 50,
               color: Colors.red,
             ),
-            Text('Error: $msg'),
+            Text('Error: $message'),
             isCupertino
                 ? CupertinoButton(
                     onPressed: () =>
@@ -205,7 +203,7 @@ class _PostListBody extends StatelessWidget {
           ],
         ),
       ),
-      PostLoaded(posts: final posts) =>
+      PostLoaded(:final posts) =>
         posts.isEmpty
             ? const Center(child: Text('No posts available.'))
             : _ActivePostList(posts: posts),
@@ -234,9 +232,7 @@ class _ActivePostList extends StatelessWidget {
 
   void _onLongPress(BuildContext context, Post post) {
     final platform = Theme.of(context).platform;
-    final isMaterial =
-        platform == TargetPlatform.android ||
-        platform == TargetPlatform.fuchsia;
+    final isMaterial = platform == .android || platform == .fuchsia;
 
     if (isMaterial) {
       final notifier = context.read<PostNotifier>();
@@ -254,8 +250,7 @@ class _ActivePostList extends StatelessWidget {
     final isSelectionMode = notifier.isSelectionMode;
 
     final platform = Theme.of(context).platform;
-    final isCupertino =
-        platform == TargetPlatform.iOS || platform == TargetPlatform.macOS;
+    final isCupertino = platform == .iOS || platform == .macOS;
 
     if (isCupertino) {
       return CustomScrollView(

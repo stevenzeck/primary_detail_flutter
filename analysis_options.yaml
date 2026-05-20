@@ -41,6 +41,9 @@ linter:
     unnecessary_this: true
     avoid_void_async: true
     prefer_relative_imports: true
+    simple_directive_paths: true
+    prefer_initializing_formals: true
+    simplify_variable_pattern: true
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
