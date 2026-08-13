@@ -5,6 +5,7 @@ import '../data/post_schema.dart';
 part 'post.g.dart';
 
 extension type const PostId(int value) implements int {}
+
 extension type const UserId(int value) implements int {}
 
 /// A model representing a post.

@@ -124,12 +124,10 @@ class MockDatabase extends Mock implements Database {
 
 class MockTransaction extends Mock implements Transaction {
   @override
-  Batch batch() =>
-      (super.noSuchMethod(
-            Invocation.method(#batch, []),
-            returnValue: MockBatch(),
-          )
-          as Batch);
+  Batch batch() => (super.noSuchMethod(
+    Invocation.method(#batch, []),
+    returnValue: MockBatch(),
+  ) as Batch);
 }
 
 class MockBatch extends Mock implements Batch {
@@ -226,17 +224,15 @@ void main() {
       postDatabase.databaseInstance = null; // Clear manual instance
 
       when(mockFactory.getDatabasesPath()).thenAnswer((_) async => 'test_path');
-      when(
-        mockFactory.openDatabase(any, options: anyNamed('options')),
-      ).thenAnswer((_) async => mockDatabase);
+      when(mockFactory.openDatabase(any, options: anyNamed('options')))
+          .thenAnswer((_) async => mockDatabase);
 
       final db = await postDatabase.database;
 
       expect(db, equals(mockDatabase));
       verify(mockFactory.getDatabasesPath()).called(1);
-      verify(
-        mockFactory.openDatabase(any, options: anyNamed('options')),
-      ).called(1);
+      verify(mockFactory.openDatabase(any, options: anyNamed('options')))
+          .called(1);
     });
 
     test(
@@ -245,12 +241,10 @@ void main() {
         postDatabase.databaseInstance = null;
         final completer = Completer<Database>();
 
-        when(
-          mockFactory.getDatabasesPath(),
-        ).thenAnswer((_) async => 'test_path');
-        when(
-          mockFactory.openDatabase(any, options: anyNamed('options')),
-        ).thenAnswer((_) => completer.future);
+        when(mockFactory.getDatabasesPath())
+            .thenAnswer((_) async => 'test_path');
+        when(mockFactory.openDatabase(any, options: anyNamed('options')))
+            .thenAnswer((_) => completer.future);
 
         // Trigger multiple concurrent calls
         final future1 = postDatabase.database;
@@ -268,9 +262,8 @@ void main() {
         expect(db3, equals(mockDatabase));
 
         // Verify initialization was only triggered once
-        verify(
-          mockFactory.openDatabase(any, options: anyNamed('options')),
-        ).called(1);
+        verify(mockFactory.openDatabase(any, options: anyNamed('options')))
+            .called(1);
       },
     );
   });
@@ -332,9 +325,8 @@ void main() {
       final result = await postDatabase.getPost(1);
 
       expect(result, tPost);
-      verify(
-        mockDatabase.query('posts', where: 'id = ?', whereArgs: [1]),
-      ).called(1);
+      verify(mockDatabase.query('posts', where: 'id = ?', whereArgs: [1]))
+          .called(1);
     });
 
     test('getPost returns null if post does not exist', () async {
@@ -384,9 +376,8 @@ void main() {
 
       await postDatabase.deletePost(1);
 
-      verify(
-        mockDatabase.delete('posts', where: 'id = ?', whereArgs: [1]),
-      ).called(1);
+      verify(mockDatabase.delete('posts', where: 'id = ?', whereArgs: [1]))
+          .called(1);
     });
 
     test('deleteAllPosts calls database delete without where', () async {
@@ -412,9 +403,8 @@ void main() {
         return await action(mockTransaction);
       });
       when(mockTransaction.batch()).thenReturn(mockBatch);
-      when(
-        mockBatch.commit(noResult: anyNamed('noResult')),
-      ).thenAnswer((_) async => <Object?>[]);
+      when(mockBatch.commit(noResult: anyNamed('noResult')))
+          .thenAnswer((_) async => <Object?>[]);
 
       await postDatabase.insertPosts([tPost]);
 
@@ -449,9 +439,8 @@ void main() {
         return await action(mockTransaction);
       });
       when(mockTransaction.batch()).thenReturn(mockBatch);
-      when(
-        mockBatch.commit(noResult: anyNamed('noResult')),
-      ).thenAnswer((_) async => <Object?>[]);
+      when(mockBatch.commit(noResult: anyNamed('noResult')))
+          .thenAnswer((_) async => <Object?>[]);
 
       await postDatabase.deletePosts([1, 2]);
 
@@ -461,12 +450,10 @@ void main() {
         ),
       ).called(1);
       verify(mockTransaction.batch()).called(1);
-      verify(
-        mockBatch.delete('posts', where: 'id = ?', whereArgs: [1]),
-      ).called(1);
-      verify(
-        mockBatch.delete('posts', where: 'id = ?', whereArgs: [2]),
-      ).called(1);
+      verify(mockBatch.delete('posts', where: 'id = ?', whereArgs: [1]))
+          .called(1);
+      verify(mockBatch.delete('posts', where: 'id = ?', whereArgs: [2]))
+          .called(1);
       verify(mockBatch.commit(noResult: true)).called(1);
     });
 

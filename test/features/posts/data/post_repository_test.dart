@@ -7,77 +7,61 @@ import 'package:primary_detail_flutter/features/posts/models/post.dart';
 
 class MockHttpService extends Mock implements HttpService {
   @override
-  Future<List<Post>> getPosts() =>
-      (super.noSuchMethod(
-            Invocation.method(#getPosts, []),
-            returnValue: Future<List<Post>>.value(<Post>[]),
-          )
-          as Future<List<Post>>);
+  Future<List<Post>> getPosts() => (super.noSuchMethod(
+    Invocation.method(#getPosts, []),
+    returnValue: Future<List<Post>>.value(<Post>[]),
+  ) as Future<List<Post>>);
 
   @override
-  Future<Post> getPost(int? postId) =>
-      (super.noSuchMethod(
-            Invocation.method(#getPost, [postId]),
-            returnValue: Future<Post>.value(
-              Post(
-                id: PostId(postId ?? 0),
-                userId: const UserId(1),
-                title: '',
-                body: '',
-              ),
-            ),
-          )
-          as Future<Post>);
+  Future<Post> getPost(int? postId) => (super.noSuchMethod(
+    Invocation.method(#getPost, [postId]),
+    returnValue: Future<Post>.value(
+      Post(
+        id: PostId(postId ?? 0),
+        userId: const UserId(1),
+        title: '',
+        body: '',
+      ),
+    ),
+  ) as Future<Post>);
 }
 
 class MockPostDatabase extends Mock implements PostDatabase {
   @override
-  Future<List<Post>> getPosts() =>
-      (super.noSuchMethod(
-            Invocation.method(#getPosts, []),
-            returnValue: Future<List<Post>>.value(<Post>[]),
-          )
-          as Future<List<Post>>);
+  Future<List<Post>> getPosts() => (super.noSuchMethod(
+    Invocation.method(#getPosts, []),
+    returnValue: Future<List<Post>>.value(<Post>[]),
+  ) as Future<List<Post>>);
 
   @override
-  Future<Post?> getPost(int? postId) =>
-      (super.noSuchMethod(
-            Invocation.method(#getPost, [postId]),
-            returnValue: Future<Post?>.value(),
-          )
-          as Future<Post?>);
+  Future<Post?> getPost(int? postId) => (super.noSuchMethod(
+    Invocation.method(#getPost, [postId]),
+    returnValue: Future<Post?>.value(),
+  ) as Future<Post?>);
 
   @override
-  Future<void> insertPosts(List<Post>? posts) =>
-      (super.noSuchMethod(
-            Invocation.method(#insertPosts, [posts]),
-            returnValue: Future<void>.value(),
-          )
-          as Future<void>);
+  Future<void> insertPosts(List<Post>? posts) => (super.noSuchMethod(
+    Invocation.method(#insertPosts, [posts]),
+    returnValue: Future<void>.value(),
+  ) as Future<void>);
 
   @override
-  Future<void> updatePost(Post? post) =>
-      (super.noSuchMethod(
-            Invocation.method(#updatePost, [post]),
-            returnValue: Future<void>.value(),
-          )
-          as Future<void>);
+  Future<void> updatePost(Post? post) => (super.noSuchMethod(
+    Invocation.method(#updatePost, [post]),
+    returnValue: Future<void>.value(),
+  ) as Future<void>);
 
   @override
-  Future<void> deletePost(int? id) =>
-      (super.noSuchMethod(
-            Invocation.method(#deletePost, [id]),
-            returnValue: Future<void>.value(),
-          )
-          as Future<void>);
+  Future<void> deletePost(int? id) => (super.noSuchMethod(
+    Invocation.method(#deletePost, [id]),
+    returnValue: Future<void>.value(),
+  ) as Future<void>);
 
   @override
-  Future<void> deletePosts(List<int>? ids) =>
-      (super.noSuchMethod(
-            Invocation.method(#deletePosts, [ids]),
-            returnValue: Future<void>.value(),
-          )
-          as Future<void>);
+  Future<void> deletePosts(List<int>? ids) => (super.noSuchMethod(
+    Invocation.method(#deletePosts, [ids]),
+    returnValue: Future<void>.value(),
+  ) as Future<void>);
 }
 
 void main() {
@@ -106,9 +90,8 @@ void main() {
     test('fetchAndEmitPosts emits local data then refreshes from API', () async {
       when(mockDatabase.getPosts()).thenAnswer((_) async => tPosts);
       when(mockHttpService.getPosts()).thenAnswer((_) async => tPosts);
-      when(
-        mockDatabase.insertPosts(any),
-      ).thenAnswer((_) async => Future<void>.value());
+      when(mockDatabase.insertPosts(any))
+          .thenAnswer((_) async => Future<void>.value());
 
       // We expect the stream to emit twice: once for local, once after refresh.
       final expectation = expectLater(
@@ -128,9 +111,8 @@ void main() {
 
     test('fetchAndEmitPosts rethrows if both DB and API fail', () async {
       when(mockDatabase.getPosts()).thenAnswer((_) async => []);
-      when(
-        mockHttpService.getPosts(),
-      ).thenThrow(PostNetworkException('API error'));
+      when(mockHttpService.getPosts())
+          .thenThrow(PostNetworkException('API error'));
 
       expect(
         () => repository.fetchAndEmitPosts(),
@@ -138,29 +120,25 @@ void main() {
       );
     });
 
-    test(
-      'fetchAndEmitPosts logs error and keeps local data if background refresh fails and local data exists',
-      () async {
-        when(mockDatabase.getPosts()).thenAnswer((_) async => tPosts);
-        when(
-          mockHttpService.getPosts(),
-        ).thenThrow(PostNetworkException('API error'));
+    test('fetchAndEmitPosts logs error and keeps local data if background refresh fails and local data exists', () async {
+      when(mockDatabase.getPosts()).thenAnswer((_) async => tPosts);
+      when(mockHttpService.getPosts())
+          .thenThrow(PostNetworkException('API error'));
 
-        // We expect the stream to emit once (the local data)
-        final expectation = expectLater(repository.postsStream, emits(tPosts));
+      // We expect the stream to emit once (the local data)
+      final expectation = expectLater(repository.postsStream, emits(tPosts));
 
-        // This should NOT throw because we have local data.
-        await repository.fetchAndEmitPosts();
+      // This should NOT throw because we have local data.
+      await repository.fetchAndEmitPosts();
 
-        await expectation;
+      await expectation;
 
-        // verify that it tried to refresh
-        verify(mockHttpService.getPosts()).called(1);
-        // 1. Initial local fetch in fetchAndEmitPosts
-        // 2. Fetch in the catch block to check if empty
-        verify(mockDatabase.getPosts()).called(2);
-      },
-    );
+      // verify that it tried to refresh
+      verify(mockHttpService.getPosts()).called(1);
+      // 1. Initial local fetch in fetchAndEmitPosts
+      // 2. Fetch in the catch block to check if empty
+      verify(mockDatabase.getPosts()).called(2);
+    });
 
     test('refreshPosts merges API data with local isRead status', () async {
       final localPost = tPost.copyWith(isRead: true);
@@ -168,9 +146,8 @@ void main() {
 
       when(mockDatabase.getPosts()).thenAnswer((_) async => [localPost]);
       when(mockHttpService.getPosts()).thenAnswer((_) async => [apiPost]);
-      when(
-        mockDatabase.insertPosts(any),
-      ).thenAnswer((_) async => Future<void>.value());
+      when(mockDatabase.insertPosts(any))
+          .thenAnswer((_) async => Future<void>.value());
 
       await repository.refreshPosts();
 
@@ -192,9 +169,8 @@ void main() {
       when(mockDatabase.getPost(1)).thenAnswer((_) async => null);
       when(mockHttpService.getPost(1)).thenAnswer((_) async => tPost);
       when(mockDatabase.getPosts()).thenAnswer((_) async => [tPost]);
-      when(
-        mockDatabase.insertPosts(any),
-      ).thenAnswer((_) async => Future<void>.value());
+      when(mockDatabase.insertPosts(any))
+          .thenAnswer((_) async => Future<void>.value());
 
       final result = await repository.getPost(1);
 
@@ -206,9 +182,8 @@ void main() {
 
     test('updatePost updates DB and emits new data', () async {
       when(mockDatabase.getPosts()).thenAnswer((_) async => [tPost]);
-      when(
-        mockDatabase.updatePost(any),
-      ).thenAnswer((_) async => Future<void>.value());
+      when(mockDatabase.updatePost(any))
+          .thenAnswer((_) async => Future<void>.value());
 
       await repository.updatePost(tPost);
 
@@ -218,9 +193,8 @@ void main() {
 
     test('deletePost deletes from DB and emits new data', () async {
       when(mockDatabase.getPosts()).thenAnswer((_) async => []);
-      when(
-        mockDatabase.deletePost(any),
-      ).thenAnswer((_) async => Future<void>.value());
+      when(mockDatabase.deletePost(any))
+          .thenAnswer((_) async => Future<void>.value());
 
       await repository.deletePost(1);
 
@@ -230,9 +204,8 @@ void main() {
 
     test('deletePosts deletes multiple from DB and emits new data', () async {
       when(mockDatabase.getPosts()).thenAnswer((_) async => []);
-      when(
-        mockDatabase.deletePosts(any),
-      ).thenAnswer((_) async => Future<void>.value());
+      when(mockDatabase.deletePosts(any))
+          .thenAnswer((_) async => Future<void>.value());
 
       await repository.deletePosts([1, 2]);
 

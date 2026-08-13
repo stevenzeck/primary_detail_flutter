@@ -23,8 +23,7 @@ class DetailPage extends StatelessWidget {
   Future<void> _deletePost(BuildContext context) async {
     final notifier = context.read<PostNotifier>();
     final router = GoRouter.of(context);
-    final isLargeScreen =
-        !showBackButton; // Heuristic: no back button usually means split view detail
+    final isLargeScreen = !showBackButton; // Heuristic: no back button usually means split view detail
 
     final shouldDelete = await showAdaptiveDialog<bool>(
       context: context,
@@ -86,9 +85,8 @@ class DetailPage extends StatelessWidget {
           children: [
             Text(
               item.title,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineMedium?.copyWith(fontWeight: .bold),
+              style: Theme.of(context).textTheme.headlineMedium
+                  ?.copyWith(fontWeight: .bold),
             ),
             const SizedBox(height: 8),
             Row(
