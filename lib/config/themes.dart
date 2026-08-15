@@ -34,23 +34,13 @@ class AppThemes {
   /// The Material dark theme configuration.
   static final ThemeData materialDarkTheme = .dark(useMaterial3: true);
 
-  /// The default dark Cupertino theme data.
-  static const darkDefaultCupertinoTheme = CupertinoThemeData(
-    brightness: .dark,
+  /// The Cupertino dark theme.
+  static const cupertinoDarkTheme = CupertinoThemeData(
+    brightness: Brightness.dark,
   );
 
-  /// The Cupertino dark theme based on the Material dark theme.
-  static final cupertinoDarkTheme = MaterialBasedCupertinoThemeData(
-    materialTheme: materialDarkTheme.copyWith(
-      cupertinoOverrideTheme: .new(
-        brightness: Brightness.dark,
-        barBackgroundColor: darkDefaultCupertinoTheme.barBackgroundColor,
-      ),
-    ),
-  );
-
-  /// The Cupertino light theme based on the Material light theme.
-  static final cupertinoLightTheme = MaterialBasedCupertinoThemeData(
-    materialTheme: materialLightTheme,
+  /// The Cupertino light theme.
+  static const cupertinoLightTheme = CupertinoThemeData(
+    brightness: Brightness.light,
   );
 }

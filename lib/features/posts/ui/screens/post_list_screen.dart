@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/widgets/adaptive_dialog_action.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/utils/platform_utils.dart';
 import '../../logic/post_notifier.dart';
 import '../../logic/post_state.dart';
 import '../../models/post.dart';
@@ -24,8 +25,7 @@ class PostsListScreen extends StatelessWidget {
     final PostNotifier(:isSelectionMode, :selectedIds) = context
         .watch<PostNotifier>();
     final selectedCount = selectedIds.length;
-    final platform = Theme.of(context).platform;
-    final isCupertinoMode = platform == .iOS || platform == .macOS;
+    final isCupertinoMode = PlatformUtils.isApple;
     final isMaterialMode = !isCupertinoMode;
 
     // Android-specific AppBar when in selection mode
@@ -170,8 +170,7 @@ class _PostListBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.select<PostNotifier, PostState>((n) => n.state);
 
-    final platform = Theme.of(context).platform;
-    final isCupertino = platform == .iOS || platform == .macOS;
+    final isCupertino = PlatformUtils.isApple;
 
     return switch (state) {
       PostInitial() || PostLoading() => const Center(
@@ -231,8 +230,7 @@ class _ActivePostList extends StatelessWidget {
   }
 
   void _onLongPress(BuildContext context, Post post) {
-    final platform = Theme.of(context).platform;
-    final isMaterial = platform == .android || platform == .fuchsia;
+    final isMaterial = !PlatformUtils.isApple;
 
     if (isMaterial) {
       final notifier = context.read<PostNotifier>();
@@ -249,8 +247,7 @@ class _ActivePostList extends StatelessWidget {
     final notifier = context.watch<PostNotifier>();
     final isSelectionMode = notifier.isSelectionMode;
 
-    final platform = Theme.of(context).platform;
-    final isCupertino = platform == .iOS || platform == .macOS;
+    final isCupertino = PlatformUtils.isApple;
 
     if (isCupertino) {
       return CustomScrollView(
@@ -336,14 +333,33 @@ class _CupertinoPostListItem extends StatelessWidget {
     if (!isSelectionMode) {
       return Dismissible(
         key: ValueKey(post.id),
-        direction: .endToStart,
+        direction: .horizontal,
         background: Container(
+          color: CupertinoColors.activeBlue,
+          alignment: .centerLeft,
+          padding: const EdgeInsets.only(left: 16.0),
+          child: Icon(
+            post.isRead
+                ? CupertinoIcons.envelope_fill
+                : CupertinoIcons.envelope_open,
+            color: Colors.white,
+          ),
+        ),
+        secondaryBackground: Container(
           color: CupertinoColors.destructiveRed,
           alignment: .centerRight,
-          padding: const .only(right: 16.0),
+          padding: const EdgeInsets.only(right: 16.0),
           child: const Icon(CupertinoIcons.delete, color: Colors.white),
         ),
         confirmDismiss: (direction) async {
+          if (direction == .startToEnd) {
+            await context.read<PostNotifier>().setReadStatus(
+              post,
+              !post.isRead,
+            );
+            return false;
+          }
+
           return await showAdaptiveDialog<bool>(
             context: context,
             builder: (context) => AlertDialog.adaptive(

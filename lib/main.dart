@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'config/router.dart';
 import 'config/themes.dart';
 import 'core/di/dependencies.dart';
+import 'core/utils/platform_utils.dart';
 
 /// The entry point of the application.
 void main() {
@@ -23,17 +24,38 @@ class PostsApp extends StatelessWidget {
       providers: appProviders,
       child: RestorationScope(
         restorationId: 'app',
-        child: MaterialApp.router(
-          localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-            DefaultMaterialLocalizations.delegate,
-            DefaultWidgetsLocalizations.delegate,
-            DefaultCupertinoLocalizations.delegate,
-          ],
-          title: 'Posts App',
-          routerConfig: router,
-          theme: AppThemes.materialLightTheme,
-          darkTheme: AppThemes.materialDarkTheme,
-          themeMode: .system,
+        child: Builder(
+          builder: (context) {
+            if (PlatformUtils.isApple) {
+              final isDarkMode =
+                  MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+              return CupertinoApp.router(
+                localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+                  DefaultMaterialLocalizations.delegate,
+                  DefaultWidgetsLocalizations.delegate,
+                  DefaultCupertinoLocalizations.delegate,
+                ],
+                title: 'Posts App',
+                routerConfig: router,
+                theme: isDarkMode
+                    ? AppThemes.cupertinoDarkTheme
+                    : AppThemes.cupertinoLightTheme,
+              );
+            }
+
+            return MaterialApp.router(
+              localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+                DefaultMaterialLocalizations.delegate,
+                DefaultWidgetsLocalizations.delegate,
+                DefaultCupertinoLocalizations.delegate,
+              ],
+              title: 'Posts App',
+              routerConfig: router,
+              theme: AppThemes.materialLightTheme,
+              darkTheme: AppThemes.materialDarkTheme,
+              themeMode: ThemeMode.system,
+            );
+          },
         ),
       ),
     );

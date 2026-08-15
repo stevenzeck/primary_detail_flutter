@@ -103,7 +103,7 @@ class PostNotifier extends ChangeNotifier {
       if (postFromList != null) {
         _selectedPost = postFromList;
         if (!postFromList.isRead) {
-          _markPostAsRead(postFromList);
+          await setReadStatus(postFromList, true);
         }
         notifyListeners();
         return;
@@ -116,7 +116,7 @@ class PostNotifier extends ChangeNotifier {
       _selectedPost = post;
 
       if (_selectedPost != null && !_selectedPost!.isRead) {
-        _markPostAsRead(_selectedPost!);
+        await setReadStatus(_selectedPost!, true);
       }
       notifyListeners();
     } catch (e) {
@@ -124,8 +124,13 @@ class PostNotifier extends ChangeNotifier {
     }
   }
 
-  void _markPostAsRead(Post post) {
-    unawaited(_repository.updatePost(post.copyWith(isRead: true)));
+  /// Sets the read status of a single post.
+  Future<void> setReadStatus(Post post, bool isRead) async {
+    try {
+      await _repository.updatePost(post.copyWith(isRead: isRead));
+    } catch (e) {
+      debugPrint('Error updating read status: $e');
+    }
   }
 
   void _setState(PostState newState) {

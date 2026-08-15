@@ -1,9 +1,11 @@
+import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/widgets/adaptive_dialog_action.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/utils/platform_utils.dart';
 import '../../logic/post_notifier.dart';
 import '../../models/post.dart';
 
@@ -74,7 +76,9 @@ class DetailPage extends StatelessWidget {
       automaticallyImplyLeading: showBackButton,
       actions: [
         IconButton(
-          icon: const Icon(Icons.delete),
+          icon: Icon(
+            PlatformUtils.isApple ? CupertinoIcons.delete : Icons.delete,
+          ),
           onPressed: () => _deletePost(context),
         ),
       ],
@@ -89,13 +93,8 @@ class DetailPage extends StatelessWidget {
                   ?.copyWith(fontWeight: .bold),
             ),
             const SizedBox(height: 8),
-            Row(
-              children: [
-                Chip(label: Text('ID: ${item.id}')),
-                const SizedBox(width: 8),
-                Chip(label: Text('User: ${item.userId}')),
-              ],
-            ),
+            Text('ID: ${item.id}'),
+            Text('User: ${item.userId}'),
             const SizedBox(height: 24),
             Card(
               elevation: 2,

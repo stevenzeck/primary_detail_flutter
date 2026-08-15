@@ -1,6 +1,8 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../utils/platform_utils.dart';
+
 class AppScaffold extends StatelessWidget {
   final Widget body;
   final Widget? title;
@@ -23,8 +25,7 @@ class AppScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final platform = Theme.of(context).platform;
-    final isCupertino = platform == .iOS || platform == .macOS;
+    final isCupertino = PlatformUtils.isApple;
 
     if (isCupertino) {
       return CupertinoPageScaffold(

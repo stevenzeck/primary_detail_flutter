@@ -1,6 +1,8 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../utils/platform_utils.dart';
+
 class AdaptiveDialogAction extends StatelessWidget {
   final Widget child;
   final VoidCallback onPressed;
@@ -15,9 +17,7 @@ class AdaptiveDialogAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final platform = Theme.of(context).platform;
-
-    if (platform == .iOS || platform == .macOS) {
+    if (PlatformUtils.isApple) {
       return CupertinoDialogAction(
         onPressed: onPressed,
         isDestructiveAction: isDestructive,
